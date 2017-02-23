@@ -1,6 +1,7 @@
 package com.techgal.simpletodo;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -9,19 +10,24 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.techgal.database.Item;
+import com.techgal.database.ToDoItemsDatabaseHelper;
+
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
-public class TodoActivity extends AppCompatActivity {
+public class TodoActivitySQLLiteHelper extends AppCompatActivity {
 
     private final int REQUEST_CODE = 1;
     private EditText etNewItem;
     private ListView lvItems;
     private ArrayList items;
     private ArrayAdapter itemsAdapter;
+    private SQLiteDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +35,7 @@ public class TodoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_todo);
         lvItems = (ListView) findViewById(R.id.lvItems);
         items = new ArrayList();
-        populateArrayItema();
+        populateArrayItems();
         lvItems.setAdapter(itemsAdapter);
         etNewItem = (EditText) findViewById(R.id.etNewItem);
 
@@ -46,7 +52,7 @@ public class TodoActivity extends AppCompatActivity {
         lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent editIntent = new Intent(TodoActivity.this, EditItemActivity.class);
+                Intent editIntent = new Intent(TodoActivitySQLLiteHelper.this, EditItemActivity.class);
                 editIntent.putExtra("editText", items.get(position).toString());
                 editIntent.putExtra("position", String.valueOf(position));
                 startActivityForResult(editIntent, REQUEST_CODE);
@@ -71,13 +77,13 @@ public class TodoActivity extends AppCompatActivity {
         }
     }
 
-    public void populateArrayItema() {
+    public void populateArrayItems() {
         readItems();
         itemsAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, items);
 
     }
 
-    private void readItems() {
+    private void readItemsFromFile() {
         File filesDir = getFilesDir();
         File file = new File(filesDir, "todo.txt");
         try {
@@ -87,16 +93,23 @@ public class TodoActivity extends AppCompatActivity {
         }
 
     }
+    private void readItems() {
+        ToDoItemsDatabaseHelper helper = ToDoItemsDatabaseHelper.getInstance(this);
+        final List<Item> allItems =  helper.getAllItems();
+        for(Item item : allItems)
+            items.add(item.text);
+    }
 
     private void writeItems() {
-        File filesDir = getFilesDir();
-        File file = new File(filesDir, "todo.txt");
-        try {
-            FileUtils.writeLines(file, items);
-        } catch (IOException ioe) {
+// In any activity just pass the context and use the singleton method
+        ToDoItemsDatabaseHelper helper = ToDoItemsDatabaseHelper.getInstance(this);
+        Item item = new Item();
+        for ( Object obj : items)
+        {
+            item.setItem((String)obj);
+            helper.addItem(item);
 
         }
-
     }
 
     public void onAddItem(View view) {
@@ -105,4 +118,7 @@ public class TodoActivity extends AppCompatActivity {
         writeItems();
         etNewItem.setText("");
     }
+
+
+
 }

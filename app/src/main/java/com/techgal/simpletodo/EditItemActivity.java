@@ -19,8 +19,6 @@ public class EditItemActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_item);
         etUpdatedItem = (EditText) findViewById(R.id.etUpdatedItem);
         etUpdatedItem.setText(editText);
-
-
     }
 
     public void onSaveEdit(View view) {
