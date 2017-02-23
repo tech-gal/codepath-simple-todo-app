@@ -25,7 +25,7 @@ The following **optional** features are implemented:
 
 The following **additional** features are implemented:
 
-* [x] Validation ot prevent duplicate task creation!
+* [x] Validation to prevent duplicate task creation!
 
 ## Video Walkthrough 
 
