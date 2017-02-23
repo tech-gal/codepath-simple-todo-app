@@ -68,7 +68,7 @@ public class TodoActivitySQLLiteInline extends AppCompatActivity {
             String etUpdatedItem = data.getStringExtra("etUpdatedItem");
             if (etUpdatedItem.trim().isEmpty()) {
                 items.remove(position);
-            } else if (!isDuplicateItem(String.valueOf(position)))
+            } else if (isDuplicateItem(String.valueOf(position)))
                 popupAlert(this, DUPLICATE_ITEM_NOT_ALLOWED_MSG);
             else {
                 items.set(position, etUpdatedItem);
